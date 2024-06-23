@@ -1,59 +1,52 @@
 from mininet.topo import Topo
 from mininet.net import Mininet
-from mininet.node import RemoteController
+from mininet.node import Controller, RemoteController, OVSSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel
+from mininet.link import TCLink
 
-class Topologia(Topo):
+class SDNTopo(Topo):
+    def build(self):
+        # Add hosts
+        hosts = []
+        for i in range(10):
+            host = self.addHost(f'PC{i}')
+            hosts.append(host)
 
-    def __init__(self):
-        #Inicia a topologia da rede
-        Topo.__init__( self )
+        # Add switches
+        sw = []
+        for i in range(7):
+            switch = self.addSwitch(f'SW{i}')
+            sw.append(switch)
 
-        # Hosts
-        pc0 = self.addHost('PC0')
-        pc1 = self.addHost('PC1')
-        pc2 = self.addHost('PC2')
-        pc3 = self.addHost('PC3')
-        pc4 = self.addHost('PC4')
-        pc5 = self.addHost('PC5')
-        pc6 = self.addHost('PC6')
-        pc7 = self.addHost('PC7')
-        pc8 = self.addHost('PC8')
-        pc9 = self.addHost('PC9')
+        # Add links between hosts and switches
+        self.addLink(hosts[0], sw[1])
+        self.addLink(hosts[1], sw[1])
+        self.addLink(hosts[2], sw[3])
+        self.addLink(hosts[3], sw[3])
+        self.addLink(hosts[4], sw[4])
+        self.addLink(hosts[5], sw[4])
+        self.addLink(hosts[6], sw[5])
+        self.addLink(hosts[7], sw[5])
+        self.addLink(hosts[8], sw[2])
+        self.addLink(hosts[9], sw[2])
 
-        # Switches
-        sw0 = self.addSwitch('SW0')
-        sw1 = self.addSwitch('SW1')
-        sw2 = self.addSwitch('SW2')
-        sw3 = self.addSwitch('SW3')
-        sw4 = self.addSwitch('SW4')
-        sw5 = self.addSwitch('SW5')
-        sw6 = self.addSwitch('SW6')
-
-        # Links
-        self.addLink(pc0, sw1)
-        self.addLink(pc1, sw1)
-        self.addLink(pc2, sw3)
-        self.addLink(pc3, sw3)
-        self.addLink(pc4, sw4)
-        self.addLink(pc5, sw4)
-        self.addLink(pc6, sw5)
-        self.addLink(pc7, sw5)
-        self.addLink(pc8, sw2)
-        self.addLink(pc9, sw2)
-
-        self.addLink(sw0, sw1)
-        self.addLink(sw0, sw3)
-        self.addLink(sw0, sw4)
-        self.addLink(sw0, sw5)
-        self.addLink(sw0, sw6)
-        self.addLink(sw1, sw6)
-        self.addLink(sw2, sw6)
+        # Add links between switches
+        self.addLink(sw[0], sw[1])
+        self.addLink(sw[0], sw[3])
+        self.addLink(sw[0], sw[4])
+        self.addLink(sw[0], sw[5])
+        self.addLink(sw[0], sw[6])
+        self.addLink(sw[1], sw[6])
+        self.addLink(sw[2], sw[6])
 
 def run():
-    topo = Topologia()
-    net = Mininet(topo=topo, controller=lambda name: RemoteController(name, ip='127.0.0.1', port=6633))
+    topo = SDNTopo()
+    net = Mininet(topo=topo, controller=RemoteController, switch=OVSSwitch, link=TCLink)
+    
+    # Add remote controller
+    net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
+
     net.start()
     CLI(net)
     net.stop()
