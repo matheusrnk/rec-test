@@ -1,6 +1,6 @@
 from mininet.topo import Topo
 from mininet.net import Mininet
-from mininet.node import RemoteController
+from mininet.node import OVSController
 from mininet.cli import CLI
 from mininet.log import setLogLevel
 from mininet.link import TCLink
@@ -16,7 +16,7 @@ class SDNTopo(Topo):
         # Add switches
         sw = []
         for i in range(7):
-            switch = self.addSwitch(f'SW{i}')
+            switch = self.addSwitch(f'SW{i}', failMode='standalone', stp=True)
             sw.append(switch)
 
         # Add links between hosts and switches
@@ -42,10 +42,10 @@ class SDNTopo(Topo):
 
 def run():
     topo = SDNTopo()
-    net = Mininet(topo=topo, controller=RemoteController, link=TCLink)
+    net = Mininet(topo=topo, controller=OVSController, link=TCLink)
 
-    # Add remote controller
-    net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
+    # Add default OVS controller
+    net.addController('c0', controller=OVSController)
 
     net.start()
     CLI(net)
