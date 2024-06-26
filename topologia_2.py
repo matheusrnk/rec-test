@@ -6,6 +6,7 @@ import mininet.node
 import time
 import csv
 import os
+import re
 
 mininet.log.info('\n*** Initialize Mininet\n')
 
@@ -88,17 +89,20 @@ def run_ping_tests(net):
             for dst in hosts:
                 if src != dst:
                     ping_result = src.cmd('ping -c 4 %s' % dst.IP())
-                    # Parse the ping_result here to extract the desired metrics
-                    # This is just an example of the output parsing; adjust as needed
-                    min_rtt, avg_rtt, max_rtt, mdev_rtt = ping_result.split('/')[-3:]
-                    writer.writerow({
-                        'source': src.name,
-                        'destination': dst.name,
-                        'min_rtt': min_rtt,
-                        'avg_rtt': avg_rtt,
-                        'max_rtt': max_rtt,
-                        'mdev_rtt': mdev_rtt
-                    })
+                    # Use regex to find the line with min/avg/max/mdev
+                    match = re.search(r'rtt min/avg/max/mdev = ([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+) ms', ping_result)
+                    if match:
+                        min_rtt, avg_rtt, max_rtt, mdev_rtt = match.groups()
+                        writer.writerow({
+                            'source': src.name,
+                            'destination': dst.name,
+                            'min_rtt': min_rtt,
+                            'avg_rtt': avg_rtt,
+                            'max_rtt': max_rtt,
+                            'mdev_rtt': mdev_rtt
+                        })
+                    else:
+                        print(f"No RTT data for {src.name} -> {dst.name}")
 
 def run_iperf_tests(net):
     hosts = net.hosts
