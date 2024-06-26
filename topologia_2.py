@@ -78,6 +78,7 @@ mininet.log.info('\n*** Run global startup commands\n')
 mininet.log.debug('[mininet]> pingall\n')
 cli.onecmd('pingall')
 
+# Funções de teste
 def run_ping_tests(net):
     hosts = net.hosts
     with open('ping_results.csv', 'w', newline='') as csvfile:
@@ -128,41 +129,53 @@ def run_iperf_tests(net):
                     else:
                         print(f"No bandwidth data for {src.name} -> {dst.name}")
 
-def run_tshark_tests(net):
+def generate_files():
+    sizes = {
+        'small': 10,  # 10 KB
+        'medium': 1000,  # 1 MB
+        'large': 10000  # 10 MB
+    }
+    for size_name, size in sizes.items():
+        with open(f'/tmp/{size_name}_file.txt', 'wb') as f:
+            f.write(os.urandom(size * 1024))
+
+def run_ftp_tests(net):
     hosts = net.hosts
+    generate_files()
+    sizes = ['small', 'medium', 'large']
+    
     if not os.path.exists('tshark_results'):
         os.makedirs('tshark_results')
 
-    for src in hosts:
-        for dst in hosts:
-            if src != dst:
-                capture_file = 'tshark_results/%s_to_%s.pcap' % (src.name, dst.name)
-                src.cmd('tshark -i %s-eth0 -w %s &' % (src.name, capture_file))
-                time.sleep(1)
-                src.cmd('ping -c 10 %s' % dst.IP())
-                time.sleep(1)
-                src.cmd('kill %tshark')
+    with open('ftp_tshark_results.csv', 'w', newline='') as csvfile:
+        fieldnames = ['source', 'destination', 'file_size', 'packets']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
 
-                tshark_result = src.cmd('tshark -r %s -q -z io,stat,0' % capture_file)
-                match = re.search(r'(\d+) packets captured', tshark_result)
-                if match:
-                    packet_loss = int(match.group(1))
-                    with open('tshark_results.csv', 'a', newline='') as csvfile:
-                        fieldnames = ['source', 'destination', 'packets']
-                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        for src in hosts:
+            for dst in hosts:
+                if src != dst:
+                    for size in sizes:
+                        capture_file = f'tshark_results/{src.name}_to_{dst.name}_{size}.pcap'
+                        src.cmd(f'tshark -i {src.name}-eth0 -w {capture_file} &')
+                        time.sleep(1)
+                        src.cmd(f'echo "put /tmp/{size}_file.txt" | ftp {dst.IP()}')
+                        time.sleep(1)
+                        src.cmd('kill %tshark')
+                        packet_count = src.cmd(f'tshark -r {capture_file} | wc -l').strip()
                         writer.writerow({
                             'source': src.name,
                             'destination': dst.name,
-                            'packets': packet_loss
+                            'file_size': size,
+                            'packets': packet_count
                         })
-                else:
-                    print(f"No packet data for {src.name} -> {dst.name}")
+                        os.remove(capture_file)
 
 # Chame as funções de teste
 mininet.log.info('\n*** Run tests\n')
 run_ping_tests(net)
 run_iperf_tests(net)
-run_tshark_tests(net)
+run_ftp_tests(net)
 
 mininet.log.info('\n*** Start CLI\n')
 
