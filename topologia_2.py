@@ -1,12 +1,12 @@
+import re
+import csv
+import os
+import time
 from mininet.cli import CLI
 from mininet.net import Mininet
 import mininet.link
 import mininet.log
 import mininet.node
-import time
-import csv
-import os
-import re
 
 mininet.log.info('\n*** Initialize Mininet\n')
 
@@ -89,7 +89,6 @@ def run_ping_tests(net):
             for dst in hosts:
                 if src != dst:
                     ping_result = src.cmd('ping -c 4 %s' % dst.IP())
-                    # Use regex to find the line with min/avg/max/mdev
                     match = re.search(r'rtt min/avg/max/mdev = ([\d.]+)/([\d.]+)/([\d.]+)/([\d.]+) ms', ping_result)
                     if match:
                         min_rtt, avg_rtt, max_rtt, mdev_rtt = match.groups()
@@ -115,16 +114,19 @@ def run_iperf_tests(net):
             for dst in hosts:
                 if src != dst:
                     dst.cmd('iperf -s &')
+                    time.sleep(1)  # Aguarde o servidor iperf iniciar
                     iperf_result = src.cmd('iperf -c %s -t 10' % dst.IP())
                     dst.cmd('kill %iperf')
-                    # Parse the iperf_result here to extract the desired metrics
-                    # This is just an example of the output parsing; adjust as needed
-                    bandwidth = iperf_result.split(' ')[-2]
-                    writer.writerow({
-                        'source': src.name,
-                        'destination': dst.name,
-                        'bandwidth': bandwidth
-                    })
+                    match = re.search(r'([\d.]+ \w+/sec)', iperf_result)
+                    if match:
+                        bandwidth = match.group(1)
+                        writer.writerow({
+                            'source': src.name,
+                            'destination': dst.name,
+                            'bandwidth': bandwidth
+                        })
+                    else:
+                        print(f"No bandwidth data for {src.name} -> {dst.name}")
 
 def run_tshark_tests(net):
     hosts = net.hosts
@@ -142,20 +144,22 @@ def run_tshark_tests(net):
                 src.cmd('kill %tshark')
 
                 tshark_result = src.cmd('tshark -r %s -q -z io,stat,0' % capture_file)
-                # Parse the tshark_result here to extract the desired metrics
-                # This is just an example of the output parsing; adjust as needed
-                packet_loss = tshark_result.split(' ')[-2]
-                with open('tshark_results.csv', 'a', newline='') as csvfile:
-                    fieldnames = ['source', 'destination', 'packet_loss']
-                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                    writer.writerow({
-                        'source': src.name,
-                        'destination': dst.name,
-                        'packet_loss': packet_loss
-                    })
+                match = re.search(r'(\d+) packets captured', tshark_result)
+                if match:
+                    packet_loss = int(match.group(1))
+                    with open('tshark_results.csv', 'a', newline='') as csvfile:
+                        fieldnames = ['source', 'destination', 'packets']
+                        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                        writer.writerow({
+                            'source': src.name,
+                            'destination': dst.name,
+                            'packets': packet_loss
+                        })
+                else:
+                    print(f"No packet data for {src.name} -> {dst.name}")
 
+# Chame as funções de teste
 mininet.log.info('\n*** Run tests\n')
-
 run_ping_tests(net)
 run_iperf_tests(net)
 run_tshark_tests(net)
