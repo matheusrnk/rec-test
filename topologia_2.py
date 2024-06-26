@@ -106,6 +106,7 @@ def run_ping_tests(net):
 
 def run_iperf_tests(net):
     hosts = net.hosts
+    port_offset = 0  # Offset para evitar o uso da mesma porta
     with open('iperf_results.csv', 'w', newline='') as csvfile:
         fieldnames = ['source', 'destination', 'bandwidth']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -114,10 +115,11 @@ def run_iperf_tests(net):
         for src in hosts:
             for dst in hosts:
                 if src != dst:
-                    dst.cmd('iperf -s &')
-                    time.sleep(1)  # Aguarde o servidor iperf iniciar
-                    iperf_result = src.cmd('iperf -c %s -t 10' % dst.IP())
-                    dst.cmd('kill %iperf')
+                    port = 5001 + port_offset
+                    dst.cmd(f'iperf -s -p {port} &')
+                    time.sleep(2)  # Aguarde o servidor iperf iniciar
+                    iperf_result = src.cmd(f'iperf -c {dst.IP()} -p {port} -t 10')
+                    dst.cmd('pkill -f iperf')  # Alterar comando para encerrar iperf corretamente
                     match = re.search(r'([\d.]+ \w+/sec)', iperf_result)
                     if match:
                         bandwidth = match.group(1)
@@ -128,6 +130,8 @@ def run_iperf_tests(net):
                         })
                     else:
                         print(f"No bandwidth data for {src.name} -> {dst.name}")
+                    
+                    port_offset += 1  # Incrementa o offset para a próxima porta
 
 def generate_files():
     sizes = {
@@ -156,12 +160,12 @@ def run_ftp_tests(net):
             for dst in hosts:
                 if src != dst:
                     for size in sizes:
-                        capture_file = f'tshark_results/{src.name}_to_{dst.name}_{size}.pcap'
+                        capture_file = f"tshark_results/{src.name}_{dst.name}_{size}.pcap"
                         src.cmd(f'tshark -i {src.name}-eth0 -w {capture_file} &')
                         time.sleep(1)
                         src.cmd(f'echo "put /tmp/{size}_file.txt" | ftp {dst.IP()}')
                         time.sleep(1)
-                        src.cmd('kill %tshark')
+                        src.cmd('pkill tshark')
                         packet_count = src.cmd(f'tshark -r {capture_file} | wc -l').strip()
                         writer.writerow({
                             'source': src.name,
