@@ -18,7 +18,7 @@ class LinuxRouter(Node):
 class Topologia(Topo):
     def build(self, **_opts):
         
-        # routers
+        # Routers
         r0 = self.addHost('R0', cls=LinuxRouter, ip='10.0.0.1/24')
         r1 = self.addHost('R1', cls=LinuxRouter, ip='10.1.0.1/24')
         r2 = self.addHost('R2', cls=LinuxRouter, ip='10.2.0.1/24')
@@ -27,7 +27,7 @@ class Topologia(Topo):
         r5 = self.addHost('R5', cls=LinuxRouter, ip='10.5.0.1/24')
         r6 = self.addHost('R6', cls=LinuxRouter, ip='10.6.0.1/24')
         
-        # switches
+        # Switches
         s0 = self.addSwitch('SW0')
         s1 = self.addSwitch('SW1')
         s2 = self.addSwitch('SW2')
@@ -36,7 +36,7 @@ class Topologia(Topo):
         s5 = self.addSwitch('SW5')
         s6 = self.addSwitch('SW6')
         
-        # adding switch to router
+        # Adding switch to router
         self.addLink(s0, r0, params2={'ip': '10.0.0.1/24'})
         self.addLink(s1, r1, params2={'ip': '10.1.0.1/24'})
         self.addLink(s2, r2, params2={'ip': '10.2.0.1/24'})
@@ -45,7 +45,7 @@ class Topologia(Topo):
         self.addLink(s5, r5, params2={'ip': '10.5.0.1/24'})
         self.addLink(s6, r6, params2={'ip': '10.6.0.1/24'})
         
-        # adding route-to-router connection
+        # Adding router-to-router connections
         self.addLink(r0, r1, params1={'ip': '10.100.0.1/24'}, params2={'ip': '10.100.0.2/24'})
         self.addLink(r0, r3, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
         self.addLink(r0, r4, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
@@ -82,6 +82,7 @@ def run():
     topo = Topologia()
     net = Mininet(topo=topo)
 
+    # Add routing for reaching networks that aren't directly connected
     info(net['R0'].cmd("ip route add 10.1.0.0/24 via 10.100.0.2 dev R0-eth1"))
     info(net['R0'].cmd("ip route add 10.3.0.0/24 via 10.101.0.2 dev R0-eth2"))
     info(net['R0'].cmd("ip route add 10.4.0.0/24 via 10.102.0.2 dev R0-eth3"))
@@ -94,7 +95,6 @@ def run():
     CLI(net)
     net.stop()
 
-#topos = {'topo_basica': (lambda: Topologia())}
 if __name__ == '__main__':
     setLogLevel('info')
     run()
