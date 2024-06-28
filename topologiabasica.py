@@ -18,13 +18,13 @@ class Topologia(Topo):
         pc9 = self.addHost('PC9')
 
         # routers
-        r0 = self.addNode('R0', cls=Node, name='router0')
-        r1 = self.addNode('R1')
-        r2 = self.addNode('R2')
-        r3 = self.addNode('R3')
-        r4 = self.addNode('R4')
-        r5 = self.addNode('R5')
-        r6 = self.addNode('R6')
+        r0 = self.addNode('R0', cls=Node)
+        r1 = self.addNode('R1', cls=Node)
+        r2 = self.addNode('R2', cls=Node)
+        r3 = self.addNode('R3', cls=Node)
+        r4 = self.addNode('R4', cls=Node)
+        r5 = self.addNode('R5', cls=Node)
+        r6 = self.addNode('R6', cls=Node)
 
         # Links
         self.addLink(pc0, r1)
