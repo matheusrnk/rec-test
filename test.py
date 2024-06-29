@@ -13,7 +13,7 @@ def myNetwork():
     net = Mininet(switch=OVSSwitch, autoSetMacs=True, autoStaticArp=True)
     
     info('*** Adicionando o Controlador\n' )
-    c1 = Controller('c1', ip='127.0.0.1', port=6653)
+    c1 = Controller('c1', ip='10.0.0.1', port=6653)
     net.addController(c1)
  
     # Add switches
