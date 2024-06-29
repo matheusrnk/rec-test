@@ -7,7 +7,6 @@ from ryu.ofproto import ofproto_v1_0
 from ryu.lib.mac import haddr_to_bin
 from ryu.lib.packet import packet, ethernet, ether_types, tcp
 
-
 class L2Switch(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_0.OFP_VERSION]    
 
@@ -68,15 +67,15 @@ class L2Switch(app_manager.RyuApp):
         pc8_mac = '1e:0b:fa:73:69:f9'
         pc9_mac = '1e:0b:fa:73:69:fa'
         
-        macs = [pc0_mac, pc1_mac, pc2_mac,pc3_mac, pc4_mac, pc5_mac,
-                pc6_mac, pc7_mac, pc8_mac,pc0_mac, pc9_mac]
+        macs = [pc0_mac, pc1_mac, pc2_mac, pc3_mac, pc4_mac, pc5_mac,
+                pc6_mac, pc7_mac, pc8_mac, pc9_mac]
 
         #self.logger.info('[%s]', str(self.num))
         #self.logger.info(
         #    "packet in -> dpid: %s, src: %s, dst: %s, in_port: %s",
         #    dpid, pkt_eth.src, pkt_eth.dst, msg.in_port)
         
-        if (pkt_tcp):
+        if pkt_tcp:
             pass
             #self.logger.info('app port dst:' + str(pkt_tcp.dst_port))
 
@@ -94,16 +93,11 @@ class L2Switch(app_manager.RyuApp):
                         out_port = 4
                 else:
                     out_port = 1
-            elif dpid in [2, 3]:
+            else:
                 if msg.in_port == 1:
                     out_port = 2
                 else:
                     out_port = 1
-            elif dpid == 4:
-                if msg.in_port == 4:
-                    out_port = 2
-                else:
-                    out_port = 4
 
         #self.logger.info('out_port: ' + str(out_port))
 
@@ -111,7 +105,7 @@ class L2Switch(app_manager.RyuApp):
         actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
 
         # adicionando um fluxo para evitar um packet_in na proxima vez
-        if (out_port != ofproto.OFPP_FLOOD):
+        if out_port != ofproto.OFPP_FLOOD:
             self.add_flow(
                 msg.datapath, msg.in_port, pkt_eth.dst,
                 pkt_eth.src, pkt_tcp.dst_port, actions)
