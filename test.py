@@ -1,43 +1,36 @@
 from mininet.net import Mininet
-from mininet.node import Controller, RemoteController, OVSController
-from mininet.node import CPULimitedHost, Host, Node
-from mininet.node import OVSKernelSwitch, UserSwitch, OVSSwitch
-from mininet.node import IVSSwitch
+from mininet.node import Controller, OVSSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
-from mininet.link import TCLink, Intf
-from subprocess import call
-
 
 def myNetwork():
-    net = Mininet(switch=OVSSwitch, autoStaticArp=True)
+    net = Mininet(switch=OVSSwitch, controller=Controller, autoStaticArp=True)
     
-    info('*** Adicionando o Controlador\n' )
-    c1 = Controller('c1', ip='127.0.0.1', port=6653)
-    net.addController(c1)
- 
+    info('*** Adding the Controller\n')
+    c0 = net.addController('c0', controller=Controller)
+    
     # Add switches
-    s0 = net.addSwitch('SW0', OVSSwitch)
-    s1 = net.addSwitch('SW1', OVSSwitch)
-    s2 = net.addSwitch('SW2', OVSSwitch)
-    s3 = net.addSwitch('SW3', OVSSwitch)
-    s4 = net.addSwitch('SW4', OVSSwitch)
-    s5 = net.addSwitch('SW5', OVSSwitch)
-    s6 = net.addSwitch('SW6', OVSSwitch)
+    s0 = net.addSwitch('s0', cls=OVSSwitch)
+    s1 = net.addSwitch('s1', cls=OVSSwitch)
+    s2 = net.addSwitch('s2', cls=OVSSwitch)
+    s3 = net.addSwitch('s3', cls=OVSSwitch)
+    s4 = net.addSwitch('s4', cls=OVSSwitch)
+    s5 = net.addSwitch('s5', cls=OVSSwitch)
+    s6 = net.addSwitch('s6', cls=OVSSwitch)
 
     # Add hosts
-    pc0 = net.addHost('PC0', mac='1e:0b:fa:73:69:f1')
-    pc1 = net.addHost('PC1', mac='1e:0b:fa:73:69:f2')
-    pc2 = net.addHost('PC2', mac='1e:0b:fa:73:69:f3')
-    pc3 = net.addHost('PC3', mac='1e:0b:fa:73:69:f4')
-    pc4 = net.addHost('PC4', mac='1e:0b:fa:73:69:f5')
-    pc5 = net.addHost('PC5', mac='1e:0b:fa:73:69:f6')
-    pc6 = net.addHost('PC6', mac='1e:0b:fa:73:69:f7')
-    pc7 = net.addHost('PC7', mac='1e:0b:fa:73:69:f8')
-    pc8 = net.addHost('PC8', mac='1e:0b:fa:73:69:f9')
-    pc9 = net.addHost('PC9', mac='1e:0b:fa:73:69:fa')
+    pc0 = net.addHost('pc0', mac='1e:0b:fa:73:69:f1')
+    pc1 = net.addHost('pc1', mac='1e:0b:fa:73:69:f2')
+    pc2 = net.addHost('pc2', mac='1e:0b:fa:73:69:f3')
+    pc3 = net.addHost('pc3', mac='1e:0b:fa:73:69:f4')
+    pc4 = net.addHost('pc4', mac='1e:0b:fa:73:69:f5')
+    pc5 = net.addHost('pc5', mac='1e:0b:fa:73:69:f6')
+    pc6 = net.addHost('pc6', mac='1e:0b:fa:73:69:f7')
+    pc7 = net.addHost('pc7', mac='1e:0b:fa:73:69:f8')
+    pc8 = net.addHost('pc8', mac='1e:0b:fa:73:69:f9')
+    pc9 = net.addHost('pc9', mac='1e:0b:fa:73:69:fa')
 
-        # Add links
+    # Add links
     net.addLink(s0, s1)
     net.addLink(s0, s2)
     net.addLink(s0, s3)
@@ -58,23 +51,24 @@ def myNetwork():
     net.addLink(pc8, s2)
     net.addLink(pc9, s2)
     
-    info('*** Iniciando a Rede\n')
+    info('*** Starting the Network\n')
     net.build()
     
-    info('*** Iniciando o Controlador\n')
-    c1.start()
+    info('*** Starting the Controller\n')
+    c0.start()
 
-    info('*** Iniciando os switches\n')
-    s1.start([c1])
-    s2.start([c1])
-    s3.start([c1])
-    s4.start([c1])
-    s5.start([c1])
-    s6.start([c1])
+    info('*** Starting the switches\n')
+    s0.start([c0])
+    s1.start([c0])
+    s2.start([c0])
+    s3.start([c0])
+    s4.start([c0])
+    s5.start([c0])
+    s6.start([c0])
     
     CLI(net)
     net.stop()
 
 if __name__ == '__main__':
-    setLogLevel( 'info' )
+    setLogLevel('info')
     myNetwork()
