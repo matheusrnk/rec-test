@@ -4,7 +4,7 @@ from mininet.cli import CLI
 from mininet.link import Link
 
 def my_network():
-    net = Mininet(controller=Controller, switch=Switch)
+    net = Mininet(controller=Controller)
 
     # Create Switches
     s1 = net.addSwitch('s1')
