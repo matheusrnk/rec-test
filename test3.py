@@ -11,13 +11,13 @@ def create_full_topology():
     net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
 
     # Adding switches
-    switch0 = net.addSwitch('s0', protocols='OpenFlow13')
-    switch1 = net.addSwitch('s1', protocols='OpenFlow13')
-    switch2 = net.addSwitch('s2', protocols='OpenFlow13')
-    switch3 = net.addSwitch('s3', protocols='OpenFlow13')
-    switch4 = net.addSwitch('s4', protocols='OpenFlow13')
-    switch5 = net.addSwitch('s5', protocols='OpenFlow13')
-    switch6 = net.addSwitch('s6', protocols='OpenFlow13')
+    switch0 = net.addSwitch('s0', protocols='OpenFlow13', stp=True)
+    switch1 = net.addSwitch('s1', protocols='OpenFlow13', stp=True)
+    switch2 = net.addSwitch('s2', protocols='OpenFlow13', stp=True)
+    switch3 = net.addSwitch('s3', protocols='OpenFlow13', stp=True)
+    switch4 = net.addSwitch('s4', protocols='OpenFlow13', stp=True)
+    switch5 = net.addSwitch('s5', protocols='OpenFlow13', stp=True)
+    switch6 = net.addSwitch('s6', protocols='OpenFlow13', stp=True)
 
     # Adding hosts
     hosts = []
