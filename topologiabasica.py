@@ -47,12 +47,13 @@ class Topologia(Topo):
         
         # Adding router-to-router connections
         self.addLink(r0, r1, params1={'ip': '10.100.0.1/24'}, params2={'ip': '10.100.0.2/24'})
-        self.addLink(r0, r3, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
-        self.addLink(r0, r4, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
-        self.addLink(r0, r5, params1={'ip': '10.103.0.1/24'}, params2={'ip': '10.103.0.2/24'})
-        self.addLink(r0, r6, params1={'ip': '10.104.0.1/24'}, params2={'ip': '10.104.0.2/24'})
-        self.addLink(r1, r6, params1={'ip': '10.105.0.1/24'}, params2={'ip': '10.105.0.2/24'})
-        self.addLink(r2, r6, params1={'ip': '10.106.0.1/24'}, params2={'ip': '10.106.0.2/24'})
+        self.addLink(r0, r2, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
+        self.addLink(r0, r3, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
+        self.addLink(r0, r4, params1={'ip': '10.103.0.1/24'}, params2={'ip': '10.103.0.2/24'})
+        self.addLink(r0, r5, params1={'ip': '10.104.0.1/24'}, params2={'ip': '10.104.0.2/24'})
+        self.addLink(r0, r6, params1={'ip': '10.105.0.1/24'}, params2={'ip': '10.105.0.2/24'})
+        self.addLink(r1, r6, params1={'ip': '10.106.0.1/24'}, params2={'ip': '10.106.0.2/24'})
+        self.addLink(r2, r6, params1={'ip': '10.107.0.1/24'}, params2={'ip': '10.107.0.2/24'})
 
         # Hosts
         pc0 = self.addHost('PC0', ip='10.1.0.250/24', defaultRoute='via 10.1.0.1')
