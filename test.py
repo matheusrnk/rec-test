@@ -4,31 +4,32 @@ from mininet.cli import CLI
 from mininet.log import setLogLevel, info
 
 def myNetwork():
-    net = Mininet(switch=OVSSwitch, controller=Controller, autoStaticArp=True)
+    # Create the network with default controller and OVS switches
+    net = Mininet(controller=Controller, switch=OVSSwitch, autoStaticArp=True)
     
     info('*** Adding the Controller\n')
-    c0 = net.addController('c0', controller=Controller)
+    c0 = net.addController('c0')
     
     # Add switches
-    s0 = net.addSwitch('s0', cls=OVSSwitch)
-    s1 = net.addSwitch('s1', cls=OVSSwitch)
-    s2 = net.addSwitch('s2', cls=OVSSwitch)
-    s3 = net.addSwitch('s3', cls=OVSSwitch)
-    s4 = net.addSwitch('s4', cls=OVSSwitch)
-    s5 = net.addSwitch('s5', cls=OVSSwitch)
-    s6 = net.addSwitch('s6', cls=OVSSwitch)
+    s0 = net.addSwitch('s0')
+    s1 = net.addSwitch('s1')
+    s2 = net.addSwitch('s2')
+    s3 = net.addSwitch('s3')
+    s4 = net.addSwitch('s4')
+    s5 = net.addSwitch('s5')
+    s6 = net.addSwitch('s6')
 
     # Add hosts
-    pc0 = net.addHost('pc0', mac='1e:0b:fa:73:69:f1')
-    pc1 = net.addHost('pc1', mac='1e:0b:fa:73:69:f2')
-    pc2 = net.addHost('pc2', mac='1e:0b:fa:73:69:f3')
-    pc3 = net.addHost('pc3', mac='1e:0b:fa:73:69:f4')
-    pc4 = net.addHost('pc4', mac='1e:0b:fa:73:69:f5')
-    pc5 = net.addHost('pc5', mac='1e:0b:fa:73:69:f6')
-    pc6 = net.addHost('pc6', mac='1e:0b:fa:73:69:f7')
-    pc7 = net.addHost('pc7', mac='1e:0b:fa:73:69:f8')
-    pc8 = net.addHost('pc8', mac='1e:0b:fa:73:69:f9')
-    pc9 = net.addHost('pc9', mac='1e:0b:fa:73:69:fa')
+    pc0 = net.addHost('pc0')
+    pc1 = net.addHost('pc1')
+    pc2 = net.addHost('pc2')
+    pc3 = net.addHost('pc3')
+    pc4 = net.addHost('pc4')
+    pc5 = net.addHost('pc5')
+    pc6 = net.addHost('pc6')
+    pc7 = net.addHost('pc7')
+    pc8 = net.addHost('pc8')
+    pc9 = net.addHost('pc9')
 
     # Add links
     net.addLink(s0, s1)
