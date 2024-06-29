@@ -17,13 +17,13 @@ def myNetwork():
     net.addController(c1)
  
     # Add switches
-    s0 = net.addSwitch('SW0', OVSSwitch)
-    s1 = net.addSwitch('SW1', OVSSwitch)
-    s2 = net.addSwitch('SW2', OVSSwitch)
-    s3 = net.addSwitch('SW3', OVSSwitch)
-    s4 = net.addSwitch('SW4', OVSSwitch)
-    s5 = net.addSwitch('SW5', OVSSwitch)
-    s6 = net.addSwitch('SW6', OVSSwitch)
+    s0 = net.addSwitch('SW0', OVSSwitch, learning=True)
+    s1 = net.addSwitch('SW1', OVSSwitch, learning=True)
+    s2 = net.addSwitch('SW2', OVSSwitch, learning=True)
+    s3 = net.addSwitch('SW3', OVSSwitch, learning=True)
+    s4 = net.addSwitch('SW4', OVSSwitch, learning=True)
+    s5 = net.addSwitch('SW5', OVSSwitch, learning=True)
+    s6 = net.addSwitch('SW6', OVSSwitch, learning=True)
 
     # Add hosts
     pc0 = net.addHost('PC0')
