@@ -47,7 +47,6 @@ class Topologia(Topo):
         
         # Adding router-to-router connections
         self.addLink(r0, r1, params1={'ip': '10.100.0.1/24'}, params2={'ip': '10.100.0.2/24'})
-        self.addLink(r0, r2, params1={'ip': '10.107.0.1/24'}, params2={'ip': '10.107.0.2/24'})
         self.addLink(r0, r3, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
         self.addLink(r0, r4, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
         self.addLink(r0, r5, params1={'ip': '10.103.0.1/24'}, params2={'ip': '10.103.0.2/24'})
@@ -110,21 +109,13 @@ def run():
     net['R1'].cmd('ip route add 10.4.0.0/24 via 10.100.0.1 dev R1-eth1') # R1 -> R0
     net['R1'].cmd('ip route add 10.5.0.0/24 via 10.100.0.1 dev R1-eth1') # R1 -> R0
 
-    net['R2'].cmd('ip route add 10.0.0.0/24 via 10.107.0.1 dev R1-eth1') # R1 -> R0
-    net['R2'].cmd('ip route add 10.1.0.0/24 via 10.107.0.1 dev R1-eth1') # R1 -> R0
-    net['R2'].cmd('ip route add 10.3.0.0/24 via 10.107.0.1 dev R1-eth1') # R1 -> R0
-    net['R2'].cmd('ip route add 10.4.0.0/24 via 10.107.0.1 dev R1-eth1') # R1 -> R0
-    net['R2'].cmd('ip route add 10.5.0.0/24 via 10.107.0.1 dev R1-eth1') # R1 -> R0
-    net['R2'].cmd('ip route add 10.6.0.0/24 via 10.106.0.1 dev R1-eth2') # R1 -> R6
-
     # R2 routes
-    #net['R2'].cmd('ip route add 10.0.0.0/24 via 10.106.0.2 dev R2-eth2')
-    #net['R2'].cmd('ip route add 10.1.0.0/24 via 10.106.0.2 dev R2-eth2')
-    #net['R2'].cmd('ip route add 10.3.0.0/24 via 10.106.0.2 dev R2-eth2')
-    #net['R2'].cmd('ip route add 10.4.0.0/24 via 10.106.0.2 dev R2-eth2')
-    #net['R2'].cmd('ip route add 10.5.0.0/24 via 10.106.0.2 dev R2-eth2')
-    #net['R2'].cmd('ip route add 10.6.0.0/24 via 10.106.0.1 dev R2-eth1')
-    #net['R2'].cmd('ip route add 10.0.0.0/24 via 10.107.0.1 dev R1-eth2') # NOVO
+    net['R2'].cmd('ip route add 10.0.0.0/24 via 10.106.0.2 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.1.0.0/24 via 10.106.0.2 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.3.0.0/24 via 10.106.0.2 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.4.0.0/24 via 10.106.0.2 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.5.0.0/24 via 10.106.0.2 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.6.0.0/24 via 10.106.0.1 dev R2-eth1')
     
     # R3 routes
     net['R3'].cmd('ip route add 10.0.0.0/24 via 10.101.0.1 dev R3-eth1')
