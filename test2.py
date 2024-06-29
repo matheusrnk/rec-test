@@ -13,10 +13,10 @@ class MultiSwitchTopology(Topo):
         switch3 = self.addSwitch('s3')
 
         # Adding hosts
-        host1 = self.addHost('h1')
-        host2 = self.addHost('h2')
-        host3 = self.addHost('h3')
-        host4 = self.addHost('h4')
+        host1 = self.addHost('h1', ip='10.0.0.1/24')
+        host2 = self.addHost('h2', ip='10.0.0.2/24')
+        host3 = self.addHost('h3', ip='10.0.0.3/24')
+        host4 = self.addHost('h4', ip='10.0.0.4/24')
 
         # Creating links between switches
         self.addLink(switch1, switch2, cls=TCLink, bw=10)
