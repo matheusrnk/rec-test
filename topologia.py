@@ -57,7 +57,7 @@ def create_topology():
     switch5.start([c0])
     switch6.start([c0])
 
-    net.startTerms()
+    net.start()
 
     CLI(net)
 
