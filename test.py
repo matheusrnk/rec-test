@@ -2,6 +2,7 @@ from mininet.cli import CLI
 from mininet.net import Mininet
 from mininet.node import RemoteController
 from mininet.term import makeTerm
+from mininet.log import setLogLevel
 
 def create_topology():
     net = Mininet(controller=RemoteController)
