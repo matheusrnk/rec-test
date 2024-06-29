@@ -54,10 +54,6 @@ def run():
     net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
     net.start()
 
-    # Verify connectivity
-    print("Testing network connectivity")
-    net.pingAll()
-
     CLI(net)
     net.stop()
 
