@@ -18,7 +18,7 @@ class LinuxRouter(Node):
 class Topologia(Topo):
     def build(self, **_opts):
         
-        # routers
+        # Routers
         r0 = self.addHost('R0', cls=LinuxRouter, ip='10.0.0.1/24')
         r1 = self.addHost('R1', cls=LinuxRouter, ip='10.1.0.1/24')
         r2 = self.addHost('R2', cls=LinuxRouter, ip='10.2.0.1/24')
@@ -27,7 +27,7 @@ class Topologia(Topo):
         r5 = self.addHost('R5', cls=LinuxRouter, ip='10.5.0.1/24')
         r6 = self.addHost('R6', cls=LinuxRouter, ip='10.6.0.1/24')
         
-        # switches
+        # Switches
         s0 = self.addSwitch('SW0')
         s1 = self.addSwitch('SW1')
         s2 = self.addSwitch('SW2')
@@ -36,7 +36,7 @@ class Topologia(Topo):
         s5 = self.addSwitch('SW5')
         s6 = self.addSwitch('SW6')
         
-        # adding switch to router
+        # Adding switch to router
         self.addLink(s0, r0, params2={'ip': '10.0.0.1/24'})
         self.addLink(s1, r1, params2={'ip': '10.1.0.1/24'})
         self.addLink(s2, r2, params2={'ip': '10.2.0.1/24'})
@@ -45,7 +45,7 @@ class Topologia(Topo):
         self.addLink(s5, r5, params2={'ip': '10.5.0.1/24'})
         self.addLink(s6, r6, params2={'ip': '10.6.0.1/24'})
         
-        # adding route-to-router connection
+        # Adding router-to-router connections
         self.addLink(r0, r1, params1={'ip': '10.100.0.1/24'}, params2={'ip': '10.100.0.2/24'})
         self.addLink(r0, r3, params1={'ip': '10.101.0.1/24'}, params2={'ip': '10.101.0.2/24'})
         self.addLink(r0, r4, params1={'ip': '10.102.0.1/24'}, params2={'ip': '10.102.0.2/24'})
@@ -81,43 +81,75 @@ class Topologia(Topo):
 def run():
     topo = Topologia()
     net = Mininet(topo=topo)
-    net.start()
-
-    # Interface configuration
-    net['R0'].cmd('ifconfig R0-eth1 10.100.0.1/24')
-    net['R0'].cmd('ifconfig R0-eth2 10.101.0.1/24')
-    net['R0'].cmd('ifconfig R0-eth3 10.102.0.1/24')
-    net['R0'].cmd('ifconfig R0-eth4 10.103.0.1/24')
-    net['R0'].cmd('ifconfig R0-eth5 10.104.0.1/24')
-    net['R1'].cmd('ifconfig R1-eth1 10.100.0.2/24')
-    net['R1'].cmd('ifconfig R1-eth2 10.105.0.1/24')
-    net['R2'].cmd('ifconfig R2-eth1 10.106.0.2/24')
-    net['R2'].cmd('ifconfig R2-eth2 10.106.0.1/24')
-    net['R3'].cmd('ifconfig R3-eth1 10.101.0.2/24')
-    net['R4'].cmd('ifconfig R4-eth1 10.102.0.2/24')
-    net['R5'].cmd('ifconfig R5-eth1 10.103.0.2/24')
-    net['R6'].cmd('ifconfig R6-eth1 10.104.0.2/24')
-    net['R6'].cmd('ifconfig R6-eth2 10.105.0.2/24')
-    net['R6'].cmd('ifconfig R6-eth3 10.106.0.1/24')
-
-    # Routing configuration
+    
+    # Assign interfaces and IP addresses
     routers = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6']
-    for router in routers:
-        net[router].cmd('ip route add 10.0.0.0/24 via 10.100.0.1 dev {}-eth1'.format(router))
-        net[router].cmd('ip route add 10.1.0.0/24 via 10.100.0.2 dev {}-eth1'.format(router))
-        net[router].cmd('ip route add 10.2.0.0/24 via 10.106.0.1 dev {}-eth2'.format(router))
-        net[router].cmd('ip route add 10.3.0.0/24 via 10.101.0.2 dev {}-eth1'.format(router))
-        net[router].cmd('ip route add 10.4.0.0/24 via 10.102.0.2 dev {}-eth1'.format(router))
-        net[router].cmd('ip route add 10.5.0.0/24 via 10.103.0.2 dev {}-eth1'.format(router))
-        net[router].cmd('ip route add 10.6.0.0/24 via 10.104.0.2 dev {}-eth2'.format(router))
+    for r in routers:
+        net[r].cmd('ip link set dev {}-eth0 up'.format(r))
+        net[r].cmd('ip link set dev {}-eth1 up'.format(r))
+        net[r].cmd('ip link set dev {}-eth2 up'.format(r))
+        net[r].cmd('ip link set dev {}-eth3 up'.format(r))
+        net[r].cmd('ip link set dev {}-eth4 up'.format(r))
+        net[r].cmd('ip link set dev {}-eth5 up'.format(r))
 
-    # Adding specific routes for PC communication
-    net['R0'].cmd('ip route add 10.2.0.0/24 via 10.106.0.2 dev R0-eth5')
-    net['R1'].cmd('ip route add 10.2.0.0/24 via 10.106.0.2 dev R1-eth2')
+    # Add routing for reaching networks that aren't directly connected
+    # R0 routes
+    net['R0'].cmd('ip route add 10.1.0.0/24 via 10.100.0.2 dev R0-eth1')
+    net['R0'].cmd('ip route add 10.2.0.0/24 via 10.106.0.2 dev R0-eth6')
+    net['R0'].cmd('ip route add 10.3.0.0/24 via 10.101.0.2 dev R0-eth2')
+    net['R0'].cmd('ip route add 10.4.0.0/24 via 10.102.0.2 dev R0-eth3')
+    net['R0'].cmd('ip route add 10.5.0.0/24 via 10.103.0.2 dev R0-eth4')
+    net['R0'].cmd('ip route add 10.6.0.0/24 via 10.104.0.2 dev R0-eth5')
+    
+    # R1 routes
+    net['R1'].cmd('ip route add 10.6.0.0/24 via 10.105.0.2 dev R1-eth2')
+    net['R1'].cmd('ip route add 10.0.0.0/24 via 10.100.0.1 dev R1-eth1')
+    net['R1'].cmd('ip route add 10.2.0.0/24 via 10.106.0.2 dev R1-eth3')
+    net['R1'].cmd('ip route add 10.3.0.0/24 via 10.100.0.1 dev R1-eth1')
+    net['R1'].cmd('ip route add 10.4.0.0/24 via 10.100.0.1 dev R1-eth1')
+    net['R1'].cmd('ip route add 10.5.0.0/24 via 10.100.0.1 dev R1-eth1')
+
+    # R2 routes
     net['R2'].cmd('ip route add 10.0.0.0/24 via 10.106.0.1 dev R2-eth2')
-    net['R6'].cmd('ip route add 10.1.0.0/24 via 10.105.0.2 dev R6-eth2')
+    net['R2'].cmd('ip route add 10.1.0.0/24 via 10.106.0.1 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.3.0.0/24 via 10.106.0.1 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.4.0.0/24 via 10.106.0.1 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.5.0.0/24 via 10.106.0.1 dev R2-eth2')
+    net['R2'].cmd('ip route add 10.6.0.0/24 via 10.106.0.2 dev R2-eth1')
+    
+    # R3 routes
+    net['R3'].cmd('ip route add 10.0.0.0/24 via 10.101.0.1 dev R3-eth1')
+    net['R3'].cmd('ip route add 10.1.0.0/24 via 10.101.0.1 dev R3-eth1')
+    net['R3'].cmd('ip route add 10.2.0.0/24 via 10.101.0.1 dev R3-eth1')
+    net['R3'].cmd('ip route add 10.4.0.0/24 via 10.101.0.1 dev R3-eth1')
+    net['R3'].cmd('ip route add 10.5.0.0/24 via 10.101.0.1 dev R3-eth1')
+    net['R3'].cmd('ip route add 10.6.0.0/24 via 10.101.0.1 dev R3-eth1')
+    
+    # R4 routes
+    net['R4'].cmd('ip route add 10.0.0.0/24 via 10.102.0.1 dev R4-eth1')
+    net['R4'].cmd('ip route add 10.1.0.0/24 via 10.102.0.1 dev R4-eth1')
+    net['R4'].cmd('ip route add 10.2.0.0/24 via 10.102.0.1 dev R4-eth1')
+    net['R4'].cmd('ip route add 10.3.0.0/24 via 10.102.0.1 dev R4-eth1')
+    net['R4'].cmd('ip route add 10.5.0.0/24 via 10.102.0.1 dev R4-eth1')
+    net['R4'].cmd('ip route add 10.6.0.0/24 via 10.102.0.1 dev R4-eth1')
+    
+    # R5 routes
+    net['R5'].cmd('ip route add 10.0.0.0/24 via 10.103.0.1 dev R5-eth1')
+    net['R5'].cmd('ip route add 10.1.0.0/24 via 10.103.0.1 dev R5-eth1')
+    net['R5'].cmd('ip route add 10.2.0.0/24 via 10.103.0.1 dev R5-eth1')
+    net['R5'].cmd('ip route add 10.3.0.0/24 via 10.103.0.1 dev R5-eth1')
+    net['R5'].cmd('ip route add 10.4.0.0/24 via 10.103.0.1 dev R5-eth1')
+    net['R5'].cmd('ip route add 10.6.0.0/24 via 10.103.0.1 dev R5-eth1')
+    
+    # R6 routes
+    net['R6'].cmd('ip route add 10.0.0.0/24 via 10.104.0.1 dev R6-eth1')
+    net['R6'].cmd('ip route add 10.1.0.0/24 via 10.105.0.1 dev R6-eth2')
     net['R6'].cmd('ip route add 10.2.0.0/24 via 10.106.0.1 dev R6-eth3')
+    net['R6'].cmd('ip route add 10.3.0.0/24 via 10.104.0.1 dev R6-eth1')
+    net['R6'].cmd('ip route add 10.4.0.0/24 via 10.104.0.1 dev R6-eth1')
+    net['R6'].cmd('ip route add 10.5.0.0/24 via 10.104.0.1 dev R6-eth1')
 
+    net.start()
     CLI(net)
     net.stop()
 
