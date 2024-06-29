@@ -102,7 +102,7 @@ def run():
     net['R1'].cmd('ip route add 10.6.0.0/24 via 10.105.0.2 dev R1-eth2') # R1 -> R6
     net['R1'].cmd('ip route add 10.0.0.0/24 via 10.100.0.1 dev R1-eth1')
     net['R1'].cmd('ip route add 10.2.0.0/24 via 10.100.0.1 dev R1-eth1')
-    #net['R1'].cmd('ip route add 10.2.0.0/24 via 10.106.0.2 dev R1-eth3')
+    net['R1'].cmd('ip route add 10.2.0.0/24 via 10.105.0.2 dev R1-eth2')
     net['R1'].cmd('ip route add 10.3.0.0/24 via 10.100.0.1 dev R1-eth1')
     net['R1'].cmd('ip route add 10.4.0.0/24 via 10.100.0.1 dev R1-eth1')
     net['R1'].cmd('ip route add 10.5.0.0/24 via 10.100.0.1 dev R1-eth1')
@@ -110,6 +110,7 @@ def run():
     # R2 routes
     net['R2'].cmd('ip route add 10.0.0.0/24 via 10.107.0.1 dev R2-eth1')
     net['R2'].cmd('ip route add 10.1.0.0/24 via 10.107.0.1 dev R2-eth1')
+    net['R2'].cmd('ip route add 10.1.0.0/24 via 10.106.0.2 dev R2-eth2')
     net['R2'].cmd('ip route add 10.3.0.0/24 via 10.107.0.1 dev R2-eth1')
     net['R2'].cmd('ip route add 10.4.0.0/24 via 10.107.0.1 dev R2-eth1')
     net['R2'].cmd('ip route add 10.5.0.0/24 via 10.107.0.1 dev R2-eth1')
