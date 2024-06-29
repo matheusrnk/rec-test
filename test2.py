@@ -5,10 +5,10 @@ from mininet.cli import CLI
 from mininet.log import setLogLevel
 
 def create_topology():
-    net = Mininet(controller=RemoteController, switch=OVSKernelSwitch, link=TCLink)
+    net = Mininet(controller=Controller, switch=OVSKernelSwitch, link=TCLink)
 
     # Adding controller
-    net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
+    net.addController('c0', controller=Controller, ip='127.0.0.1', port=6633)
 
     # Adding switches
     switch0 = net.addSwitch('s0')
