@@ -26,7 +26,8 @@ def create_topology():
     net.start()
 
     # Start the Ryu controller
-    s1.start([c0])
+    for switch in net.switches:
+        switch.start([c0])
 
     # Open Mininet CLI
     CLI(net)
