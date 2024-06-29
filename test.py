@@ -20,16 +20,16 @@ def myNetwork():
     s6 = net.addSwitch('s6')
 
     # Add hosts with IP addresses in the same subnet
-    pc0 = net.addHost('pc0', ip='10.0.1.10/24', mac='1e:0b:fa:73:69:f1')
-    pc1 = net.addHost('pc1', ip='10.0.1.11/24', mac='1e:0b:fa:73:69:f2')
-    pc2 = net.addHost('pc2', ip='10.0.2.10/24', mac='1e:0b:fa:73:69:f3')
-    pc3 = net.addHost('pc3', ip='10.0.2.11/24', mac='1e:0b:fa:73:69:f4')
-    pc4 = net.addHost('pc4', ip='10.0.3.10/24', mac='1e:0b:fa:73:69:f5')
-    pc5 = net.addHost('pc5', ip='10.0.3.11/24', mac='1e:0b:fa:73:69:f6')
-    pc6 = net.addHost('pc6', ip='10.0.4.10/24', mac='1e:0b:fa:73:69:f7')
-    pc7 = net.addHost('pc7', ip='10.0.4.11/24', mac='1e:0b:fa:73:69:f8')
-    pc8 = net.addHost('pc8', ip='10.0.5.10/24', mac='1e:0b:fa:73:69:f9')
-    pc9 = net.addHost('pc9', ip='10.0.5.11/24', mac='1e:0b:fa:73:69:fa')
+    pc0 = net.addHost('pc0', ip='10.0.0.10/8', mac='1e:0b:fa:73:69:f1')
+    pc1 = net.addHost('pc1', ip='10.0.0.11/8', mac='1e:0b:fa:73:69:f2')
+    pc2 = net.addHost('pc2', ip='10.0.0.12/8', mac='1e:0b:fa:73:69:f3')
+    pc3 = net.addHost('pc3', ip='10.0.0.13/8', mac='1e:0b:fa:73:69:f4')
+    pc4 = net.addHost('pc4', ip='10.0.0.14/8', mac='1e:0b:fa:73:69:f5')
+    pc5 = net.addHost('pc5', ip='10.0.0.15/8', mac='1e:0b:fa:73:69:f6')
+    pc6 = net.addHost('pc6', ip='10.0.0.16/8', mac='1e:0b:fa:73:69:f7')
+    pc7 = net.addHost('pc7', ip='10.0.0.17/8', mac='1e:0b:fa:73:69:f8')
+    pc8 = net.addHost('pc8', ip='10.0.0.18/8', mac='1e:0b:fa:73:69:f9')
+    pc9 = net.addHost('pc9', ip='10.0.0.19/8', mac='1e:0b:fa:73:69:fa')
 
     # Add links
     net.addLink(s0, s1)
