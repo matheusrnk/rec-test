@@ -37,7 +37,7 @@ class Controller(RyuApp):
         parser = datapath.ofproto_parser
         match = parser.OFPMatch()
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER, ofproto.OFPCML_NO_BUFFER)]
-        self.logger.info("Handshake taken place with {}".format(dpid_to_str(datapath.id)))
+        #self.logger.info("Handshake taken place with {}".format(dpid_to_str(datapath.id)))
         self.__add_flow(datapath, 0, match, actions)
 
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
@@ -59,7 +59,7 @@ class Controller(RyuApp):
         data = msg.data if msg.buffer_id == ofproto.OFP_NO_BUFFER else None
         actions = [datapath.ofproto_parser.OFPActionOutput(ofproto.OFPP_FLOOD)]
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id, in_port=in_port, actions=actions, data=data)
-        self.logger.info("Sending packet out")
+        #self.logger.info("Sending packet out")
         datapath.send_msg(out)
         return
 
