@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import socket
 from ryu.base import app_manager
 from ryu.controller import ofp_event
 from ryu.controller.handler import MAIN_DISPATCHER, set_ev_cls
@@ -10,7 +11,22 @@ class SimpleForwardingController(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
     def __init__(self, *args, **kwargs):
-        super(SimpleForwardingController, self).__init__(*args, **kwargs)
+        super(SimpleSwitch13, self).__init__(*args, **kwargs)
+        # Bind the controller to a specific IP and port
+        self.bind_controller()
+
+    def bind_controller(self):
+        try:
+            # Specify the IP address and port here
+            ip_address = '0.0.0.0'  # Listen on all interfaces
+            port_number = 6633  # Default OpenFlow port
+            server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            server_socket.bind((ip_address, port_number))
+            server_socket.listen(1)
+            print(f'Ryu controller bound to {ip_address}:{port_number}')
+        except Exception as e:
+            print(f'Failed to bind Ryu controller: {str(e)}')
 
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, MAIN_DISPATCHER)
     def switch_features_handler(self, ev):
