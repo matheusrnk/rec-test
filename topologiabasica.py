@@ -86,7 +86,7 @@ def run():
     # Assign interfaces and IP addresses
     routers = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6']
     for r in routers:
-        for i in range(7):
+        for i in range(6):
             net[r].cmd('ip link set dev {}-eth{} up'.format(r, i))
     
     # Add routing for reaching networks that aren't directly connected
@@ -112,7 +112,7 @@ def run():
     net['R2'].cmd('ip route add 10.3.0.0/24 via 10.107.0.1 dev R2-eth1')
     net['R2'].cmd('ip route add 10.4.0.0/24 via 10.107.0.1 dev R2-eth1')
     net['R2'].cmd('ip route add 10.5.0.0/24 via 10.107.0.1 dev R2-eth1')
-    net['R2'].cmd('ip route add 10.6.0.0/24 via 10.106.0.2 dev R2-eth3') # R2 -> R6
+    net['R2'].cmd('ip route add 10.6.0.0/24 via 10.106.0.2 dev R2-eth2') # R2 -> R6 this is not defined like ??
     
     # R3 routes
     net['R3'].cmd('ip route add 10.0.0.0/24 via 10.101.0.1 dev R3-eth1')
