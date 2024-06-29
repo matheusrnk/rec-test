@@ -22,16 +22,16 @@ def my_network():
     pc_pt = net.addHost('pc_pt', ip='10.0.2.1/24', defaultRoute='yes')  # Assuming specific IP for pc_pt
 
     # Create Links - Refer to your diagram for specific connections
-    Link(s1, h1)
-    Link(s1, s2)
-    Link(s1, s3)
-    Link(s2, s4)
-    Link(s2, s5)
-    Link(s3, s6)
-    Link(s4, h2)
-    Link(s5, h3)
-    Link(s6, h4)
-    Link(s4, pc_pt)  # Assuming PC_PT connects to s4
+    net.addLink(s1, h1)
+    net.addLink(s1, s2)
+    net.addLink(s1, s3)
+    net.addLink(s2, s4)
+    net.addLink(s2, s5)
+    net.addLink(s3, s6)
+    net.addLink(s4, h2)
+    net.addLink(s5, h3)
+    net.addLink(s6, h4)
+    net.addLink(s4, pc_pt)  # Assuming PC_PT connects to s4
 
     net.start()
     CLI(net)
