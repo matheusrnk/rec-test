@@ -1,6 +1,6 @@
 from mininet.topo import Topo
 from mininet.net import Mininet
-from mininet.node import Controller
+from mininet.node import RemoteController
 from mininet.link import TCLink
 from mininet.cli import CLI
 
@@ -28,7 +28,6 @@ class CustomTopo(Topo):
         pc9 = self.addHost('PC9', ip='10.0.0.10/24')
 
         # Add links
-        # Add links
         self.addLink(s0, s1)
         self.addLink(s0, s2)
         self.addLink(s0, s3)
@@ -51,9 +50,14 @@ class CustomTopo(Topo):
 
 def run():
     topo = CustomTopo()
-    net = Mininet(topo=topo, controller=Controller, link=TCLink)
+    net = Mininet(topo=topo, controller=RemoteController, link=TCLink)
+    net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6633)
     net.start()
-    
+
+    # Verify connectivity
+    print("Testing network connectivity")
+    net.pingAll()
+
     CLI(net)
     net.stop()
 
