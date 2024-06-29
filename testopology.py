@@ -20,7 +20,7 @@ def create_topology():
     net.addLink(s2, h2)
 
     # Add Ryu controller
-    net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6653)
+    c0 = net.addController('c0', controller=RemoteController, ip='127.0.0.1', port=6653)
 
     # Start Mininet
     net.start()
