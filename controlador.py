@@ -88,7 +88,7 @@ class SimpleSwitch13(simple_switch_13.SimpleSwitch13):
         dp = ev.dp
         dpid_str = dpid_lib.dpid_to_str(dp.id)
         msg = 'Receive topology change event. Flush MAC table.'
-        self.logger.debug("[dpid=%s] %s", dpid_str, msg)
+        #self.logger.debug("[dpid=%s] %s", dpid_str, msg)
 
         if dp.id in self.mac_to_port:
             self.delete_flow(dp)
@@ -102,5 +102,5 @@ class SimpleSwitch13(simple_switch_13.SimpleSwitch13):
                     stplib.PORT_STATE_LISTEN: 'LISTEN',
                     stplib.PORT_STATE_LEARN: 'LEARN',
                     stplib.PORT_STATE_FORWARD: 'FORWARD'}
-        self.logger.debug("[dpid=%s][port=%d] state=%s",
-                          dpid_str, ev.port_no, of_state[ev.port_state])
+        #self.logger.debug("[dpid=%s][port=%d] state=%s",
+        #                  dpid_str, ev.port_no, of_state[ev.port_state])
