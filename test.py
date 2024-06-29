@@ -64,5 +64,5 @@ def create_topology():
     net.stop()
 
 if __name__ == '__main__':
-    setLogLevel('info')
+    #setLogLevel('info')
     create_topology()
