@@ -71,13 +71,14 @@ class L2Switch(app_manager.RyuApp):
         macs = [pc0_mac, pc1_mac, pc2_mac,pc3_mac, pc4_mac, pc5_mac,
                 pc6_mac, pc7_mac, pc8_mac,pc0_mac, pc9_mac]
 
-        self.logger.info('[%s]', str(self.num))
-        self.logger.info(
-            "packet in -> dpid: %s, src: %s, dst: %s, in_port: %s",
-            dpid, pkt_eth.src, pkt_eth.dst, msg.in_port)
+        #self.logger.info('[%s]', str(self.num))
+        #self.logger.info(
+        #    "packet in -> dpid: %s, src: %s, dst: %s, in_port: %s",
+        #    dpid, pkt_eth.src, pkt_eth.dst, msg.in_port)
         
         if (pkt_tcp):
-            self.logger.info('app port dst:' + str(pkt_tcp.dst_port))
+            pass
+            #self.logger.info('app port dst:' + str(pkt_tcp.dst_port))
 
         # Logica para adicionar os fluxos
         out_port = ofproto.OFPP_FLOOD
@@ -104,7 +105,7 @@ class L2Switch(app_manager.RyuApp):
                 else:
                     out_port = 4
 
-        self.logger.info('out_port: ' + str(out_port))
+        #self.logger.info('out_port: ' + str(out_port))
 
         # definindo a acao a ser tomada com base na porta de destino
         actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
