@@ -1,53 +1,42 @@
 from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.node import RemoteController
 from mininet.link import TCLink
+from mininet.cli import CLI
 
-
-class Topologia(Topo):
-
+class CustomTopo(Topo):
     def build(self):
+        # Add switches
+        s1 = self.addSwitch('s1')
+        s2 = self.addSwitch('s2')
 
-         # Add switches
-        s0 = self.addSwitch('SW0')
-        s1 = self.addSwitch('SW1')
-        s2 = self.addSwitch('SW2')
-        s3 = self.addSwitch('SW3')
-        s4 = self.addSwitch('SW4')
-        s5 = self.addSwitch('SW5')
-        s6 = self.addSwitch('SW6')
-
-        # Add hosts with specific IPs
-        pc0 = self.addHost('PC0')
-        pc1 = self.addHost('PC1')
-        pc2 = self.addHost('PC2')
-        pc3 = self.addHost('PC3')
-        pc4 = self.addHost('PC4')
-        pc5 = self.addHost('PC5')
-        pc6 = self.addHost('PC6')
-        pc7 = self.addHost('PC7')
-        pc8 = self.addHost('PC8')
-        pc9 = self.addHost('PC9')
+        # Add hosts
+        h1 = self.addHost('h1', ip='10.0.0.1/24')
+        h2 = self.addHost('h2', ip='10.0.0.2/24')
+        h3 = self.addHost('h3', ip='10.1.0.1/24')
+        h4 = self.addHost('h4', ip='10.1.0.2/24')
 
         # Add links
-        self.addLink(s0, s1)
-        self.addLink(s0, s2)
-        self.addLink(s0, s3)
-        self.addLink(s0, s4)
-        self.addLink(s0, s5)
-        self.addLink(s0, s6)
-        self.addLink(s1, s6)
-        self.addLink(s2, s6)
-        
-        self.addLink(pc0, s1, cls=TCLink)
-        self.addLink(pc1, s1, cls=TCLink)
-        self.addLink(pc2, s3, cls=TCLink)
-        self.addLink(pc3, s3, cls=TCLink)
-        self.addLink(pc4, s4, cls=TCLink)
-        self.addLink(pc5, s4, cls=TCLink)
-        self.addLink(pc6, s5, cls=TCLink)
-        self.addLink(pc7, s5, cls=TCLink)
-        self.addLink(pc8, s2, cls=TCLink)
-        self.addLink(pc9, s2, cls=TCLink)
-            
-topos = {
-    'topologia': (lambda: Topologia()),
-}
+        self.addLink(h1, s1)
+        self.addLink(h2, s1)
+        self.addLink(s1, s2)
+        self.addLink(s2, h3)
+        self.addLink(s2, h4)
+
+def run():
+    topo = CustomTopo()
+    net = Mininet(topo=topo, controller=RemoteController, link=TCLink)
+    net.start()
+    
+    # Add routes for hosts on different subnets to communicate
+    h1, h2, h3, h4 = net.get('h1', 'h2', 'h3', 'h4')
+    h1.cmd('route add -net 10.1.0.0/24 gw 10.0.0.254')
+    h2.cmd('route add -net 10.1.0.0/24 gw 10.0.0.254')
+    h3.cmd('route add -net 10.0.0.0/24 gw 10.1.0.254')
+    h4.cmd('route add -net 10.0.0.0/24 gw 10.1.0.254')
+
+    CLI(net)
+    net.stop()
+
+if __name__ == '__main__':
+    run()
