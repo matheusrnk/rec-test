@@ -86,7 +86,7 @@ def run():
     # Assign interfaces and IP addresses
     routers = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5', 'R6']
     for r in routers:
-        for i in range(6):
+        for i in range(7):
             net[r].cmd('ip link set dev {}-eth{} up'.format(r, i))
     
     # Add routing for reaching networks that aren't directly connected
