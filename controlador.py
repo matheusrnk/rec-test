@@ -1,74 +1,128 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
-import socket
 from ryu.base import app_manager
 from ryu.controller import ofp_event
 from ryu.controller.handler import MAIN_DISPATCHER, set_ev_cls
-from ryu.ofproto import ofproto_v1_3
-from ryu.lib.packet import packet, ethernet
+from ryu.ofproto import ofproto_v1_0
+from ryu.lib.mac import haddr_to_bin
+from ryu.lib.packet import packet, ethernet, ether_types, tcp
 
-class SimpleSwitch13(app_manager.RyuApp):
-    OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
+
+class L2Switch(app_manager.RyuApp):
+    OFP_VERSIONS = [ofproto_v1_0.OFP_VERSION]    
 
     def __init__(self, *args, **kwargs):
-        super(SimpleSwitch13, self).__init__(*args, **kwargs)
-        # Bind the controller to a specific IP and port
-        self.bind_controller()
+        super(L2Switch, self).__init__(*args, **kwargs)
+        self.num = 0
 
-    def bind_controller(self):
-        try:
-            # Specify the IP address and port here
-            ip_address = '0.0.0.0'  # Listen on all interfaces
-            port_number = 6633  # Default OpenFlow port
-            server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            server_socket.bind((ip_address, port_number))
-            server_socket.listen(1)
-            print(f'Ryu controller bound to {ip_address}:{port_number}')
-        except Exception as e:
-            print(f'Failed to bind Ryu controller: {str(e)}')
-
-    @set_ev_cls(ofp_event.EventOFPSwitchFeatures, MAIN_DISPATCHER)
-    def switch_features_handler(self, ev):
-        datapath = ev.datapath
+    def add_flow(self, datapath, in_port, dst, src, tp_dst, actions):
         ofproto = datapath.ofproto
-        parser = datapath.parser
 
-        # Install the table-miss flow entry.
-        match = parser.OFPMatch()
-        actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,
-                                          ofproto.OFPCML_NO_BUFFER)]
-        mod = parser.OFPFlowMod(datapath=datapath, priority=0,
-                                commands=parser.OFPFC_ADD, match=match,
-                                actions=actions)
+        match = datapath.ofproto_parser.OFPMatch(
+            in_port=in_port, tp_dst=tp_dst, dl_type=2048, nw_proto=6,
+            dl_dst=haddr_to_bin(dst), dl_src=haddr_to_bin(src))
+
+        mod = datapath.ofproto_parser.OFPFlowMod(
+            datapath=datapath, match=match, cookie=0,
+            command=ofproto.OFPFC_ADD, idle_timeout=0, hard_timeout=0,
+            priority=ofproto.OFP_DEFAULT_PRIORITY,
+            flags=ofproto.OFPFF_CHECK_OVERLAP, actions=actions)
         datapath.send_msg(mod)
-
+    
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def packet_in_handler(self, ev):
+        # Dados sendo transmitidos
         msg = ev.msg
+
+        # Switch que emitiu o evento
         datapath = msg.datapath
+        
+        # id do switch que se comunicou com esse controlador
+        dpid = datapath.id 
+
+        # openflow protocol
         ofproto = datapath.ofproto
-        parser = datapath.parser
-        in_port = msg.match['in_port']
+
+        # O Pacote (pronto para ser trabalhado com nossas libs)
         pkt = packet.Packet(msg.data)
 
-        eth = pkt.get_protocol(ethernet.ethernet)
+        # O pacote interpretado no "ponto de vista" Ethernet
+        pkt_eth = pkt.get_protocol(ethernet.ethernet)
 
-        if eth is None:
+        # O pacote interpretado no "ponto de vista" TCP
+        pkt_tcp = pkt.get_protocol(tcp.tcp)
+
+        # Ignorando pacotes LLDP
+        if pkt_eth.ethertype == ether_types.ETH_TYPE_LLDP:
             return
 
-        dst = eth.dst
-        src = eth.src
+        # macs da topologia que queremos comunicar os pings
+        pc0_mac = '1e:0b:fa:73:69:f1'
+        pc1_mac = '1e:0b:fa:73:69:f2'
+        pc2_mac = '1e:0b:fa:73:69:f3'
+        pc3_mac = '1e:0b:fa:73:69:f4'
+        pc4_mac = '1e:0b:fa:73:69:f5'
+        pc5_mac = '1e:0b:fa:73:69:f6'
+        pc6_mac = '1e:0b:fa:73:69:f7'
+        pc7_mac = '1e:0b:fa:73:69:f8'
+        pc8_mac = '1e:0b:fa:73:69:f9'
+        pc9_mac = '1e:0b:fa:73:69:fa'
+        
+        macs = [pc0_mac, pc1_mac, pc2_mac,pc3_mac, pc4_mac, pc5_mac,
+                pc6_mac, pc7_mac, pc8_mac,pc0_mac, pc9_mac]
 
-        # Simple forwarding logic: forward to the next hop towards the destination
-        # This is a very basic example and might need adjustments based on your topology
-        if dst[0] == '10':
-            out_port = 1  # Assuming port 1 leads to the next hop towards the destination
-        else:
-            out_port = ofproto.OFPP_FLOOD
+        self.logger.info('[%s]', str(self.num))
+        self.logger.info(
+            "packet in -> dpid: %s, src: %s, dst: %s, in_port: %s",
+            dpid, pkt_eth.src, pkt_eth.dst, msg.in_port)
+        
+        if (pkt_tcp):
+            self.logger.info('app port dst:' + str(pkt_tcp.dst_port))
 
-        actions = [parser.OFPActionOutput(out_port)]
-        mod = parser.OFPFlowMod(datapath=datapath, cookie=0,
-                                priority=1, match=parser.OFPMatch(in_port=in_port, eth_type=eth.ethertype, eth_dst=dst),
-                                actions=actions)
-        datapath.send_msg(mod)
+        # Logica para adicionar os fluxos
+        out_port = ofproto.OFPP_FLOOD
+        mac_any = any([pkt_eth.src == m and pkt_eth.dst == m for m in macs])
+        if mac_any and pkt_tcp:
+            if dpid == 1:
+                if msg.in_port == 1:
+                    if pkt_tcp.dst_port == 5001:
+                        out_port = 2
+                    elif pkt_tcp.dst_port == 5002:
+                        out_port = 3
+                    elif pkt_tcp.dst_port == 5003:
+                        out_port = 4
+                else:
+                    out_port = 1
+            elif dpid in [2, 3]:
+                if msg.in_port == 1:
+                    out_port = 2
+                else:
+                    out_port = 1
+            elif dpid == 4:
+                if msg.in_port == 4:
+                    out_port = 2
+                else:
+                    out_port = 4
+
+        self.logger.info('out_port: ' + str(out_port))
+
+        # definindo a acao a ser tomada com base na porta de destino
+        actions = [datapath.ofproto_parser.OFPActionOutput(out_port)]
+
+        # adicionando um fluxo para evitar um packet_in na proxima vez
+        if (out_port != ofproto.OFPP_FLOOD):
+            self.add_flow(
+                msg.datapath, msg.in_port, pkt_eth.dst,
+                pkt_eth.src, pkt_tcp.dst_port, actions)
+        
+        data = None
+        if msg.buffer_id == ofproto.OFP_NO_BUFFER:
+            data = msg.data
+
+        # encaminhando o pacote
+        out = datapath.ofproto_parser.OFPPacketOut(
+            datapath=datapath, buffer_id=msg.buffer_id, in_port=msg.in_port,
+            actions=[datapath.ofproto_parser.OFPActionOutput(out_port)],
+            data=data)
+        datapath.send_msg(out)
+        self.num += 1
