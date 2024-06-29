@@ -1,14 +1,14 @@
-from mininet.net import Mininet
-from mininet.node import Controller, OVSKernelSwitch, RemoteController
-from mininet.link import TCLink
 from mininet.cli import CLI
+from mininet.net import Mininet
+from mininet.node import RemoteController
+from mininet.term import makeTerm
 from mininet.log import setLogLevel
 
 def create_topology():
-    net = Mininet(controller=Controller, switch=OVSKernelSwitch, link=TCLink)
+    net = Mininet(controller=RemoteController)
 
     # Adding controller
-    net.addController('c0', controller=Controller, ip='127.0.0.1', port=6633)
+    c0 = net.addController('c0', port=6633)
 
     # Adding switches
     switch0 = net.addSwitch('s0')
@@ -32,6 +32,8 @@ def create_topology():
     net.addLink(switch0, switch3)
     net.addLink(switch0, switch4)
     net.addLink(switch0, switch5)
+    net.addLink(switch0, switch1)
+    net.addLink(switch0, switch2)
 
     # Adding links between switches and hosts
     net.addLink(switch1, hosts[0])
@@ -45,15 +47,22 @@ def create_topology():
     net.addLink(switch2, hosts[8])
     net.addLink(switch2, hosts[9])
 
-    # Start the network
-    net.start()
+    net.build()
+    c0.start()
+    switch0.start([c0])
+    switch1.start([c0])
+    switch2.start([c0])
+    switch3.start([c0])
+    switch4.start([c0])
+    switch5.start([c0])
+    switch6.start([c0])
 
-    # Running CLI
+    net.startTerms()
+
     CLI(net)
 
-    # Stop the network
     net.stop()
 
 if __name__ == '__main__':
-    setLogLevel('info')
+    #setLogLevel('info')
     create_topology()
