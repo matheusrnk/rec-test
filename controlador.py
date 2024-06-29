@@ -7,7 +7,6 @@ from ryu.ofproto import ofproto_v1_0
 from ryu.lib.mac import haddr_to_bin
 from ryu.lib.packet import packet, ethernet, ether_types, tcp
 
-
 class L2Switch(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_0.OFP_VERSION]
 
@@ -53,7 +52,7 @@ class L2Switch(app_manager.RyuApp):
         self.logger.info("packet in -> dpid: %s, src: %s, dst: %s, in_port: %s",
                          dpid, src, dst, in_port)
 
-        # learn a mac address to avoid FLOOD next time.
+        # Learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port
 
         if dst in self.mac_to_port[dpid]:
@@ -63,6 +62,7 @@ class L2Switch(app_manager.RyuApp):
 
         actions = [parser.OFPActionOutput(out_port)]
 
+        # Install a flow to avoid packet_in next time
         if out_port != ofproto.OFPP_FLOOD:
             self.add_flow(datapath, in_port, dst, src, actions)
 
@@ -75,9 +75,12 @@ class L2Switch(app_manager.RyuApp):
             actions=actions, data=data)
         datapath.send_msg(out)
 
-    @set_ev_cls(ofp_event.EventOFPStateChange, MAIN_DISPATCHER)
-    def state_change_handler(self, ev):
-        datapath = ev.datapath
-        if datapath.id not in self.mac_to_port:
-            self.logger.info("New switch connected: %s", datapath.id)
-            self.mac_to_port[datapath.id] = {}
+        # Forward the packet to all other switches
+        for dp in self.mac_to_port.keys():
+            if dp != dpid:
+                datapath = self.mac_to_port[dp]
+                actions = [parser.OFPActionOutput(ofproto.OFPP_FLOOD)]
+                out = parser.OFPPacketOut(
+                    datapath=datapath, buffer_id=ofproto.OFP_NO_BUFFER, in_port=ofproto.OFPP_CONTROLLER,
+                    actions=actions, data=msg.data)
+                datapath.send_msg(out)
