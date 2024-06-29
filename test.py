@@ -10,7 +10,7 @@ from subprocess import call
 
 
 def myNetwork():
-    net = Mininet(switch=OVSSwitch, autoStaticArp=True)
+    net = Mininet(switch=OVSSwitch, autoSetMacs=True, autoStaticArp=True)
     
     info('*** Adicionando o Controlador\n' )
     c1 = Controller('c1', ip='127.0.0.1', port=6653)
@@ -26,16 +26,16 @@ def myNetwork():
     s6 = net.addSwitch('SW6', OVSSwitch)
 
     # Add hosts
-    pc0 = net.addHost('PC0', mac='1e:0b:fa:73:69:f1')
-    pc1 = net.addHost('PC1', mac='1e:0b:fa:73:69:f2')
-    pc2 = net.addHost('PC2', mac='1e:0b:fa:73:69:f3')
-    pc3 = net.addHost('PC3', mac='1e:0b:fa:73:69:f4')
-    pc4 = net.addHost('PC4', mac='1e:0b:fa:73:69:f5')
-    pc5 = net.addHost('PC5', mac='1e:0b:fa:73:69:f6')
-    pc6 = net.addHost('PC6', mac='1e:0b:fa:73:69:f7')
-    pc7 = net.addHost('PC7', mac='1e:0b:fa:73:69:f8')
-    pc8 = net.addHost('PC8', mac='1e:0b:fa:73:69:f9')
-    pc9 = net.addHost('PC9', mac='1e:0b:fa:73:69:fa')
+    pc0 = net.addHost('PC0')
+    pc1 = net.addHost('PC1')
+    pc2 = net.addHost('PC2')
+    pc3 = net.addHost('PC3')
+    pc4 = net.addHost('PC4')
+    pc5 = net.addHost('PC5')
+    pc6 = net.addHost('PC6')
+    pc7 = net.addHost('PC7')
+    pc8 = net.addHost('PC8')
+    pc9 = net.addHost('PC9')
 
         # Add links
     net.addLink(s0, s1)
