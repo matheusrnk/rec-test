@@ -33,7 +33,6 @@ def create_topology():
     net.addLink(switch0, switch4)
     net.addLink(switch0, switch5)
     net.addLink(switch0, switch2)
-    net.addLink(switch0, switch1)
 
     # Adding links between switches and hosts
     net.addLink(switch1, hosts[0])
