@@ -1,5 +1,5 @@
-from miniself.topo import Topo
-from miniself.link import TCLink
+from mininet.topo import Topo
+from mininet.link import TCLink
 
 
 class Topologia(Topo):
